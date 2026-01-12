@@ -1,0 +1,235 @@
+.my-bubbles-page {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.my-bubbles-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.back-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: #e5e7eb;
+}
+
+.my-bubbles-header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.header-spacer {
+    width: 100px;
+}
+
+.my-bubbles-main {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* States */
+.loading-state,
+.error-state,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f0f0f0;
+    border-top-color: #e63946;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+    font-size: 1.5rem;
+    color: #1a1a2e;
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+    color: #6b7280;
+    margin: 0 0 1.5rem 0;
+}
+
+.empty-state button,
+.error-state button {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.empty-state button:hover,
+.error-state button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
+}
+
+/* Bubbles Grid */
+.bubbles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.bubble-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+
+.bubble-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.open {
+    background: #16a34a;
+}
+
+.status-dot.closed {
+    background: #9ca3af;
+}
+
+.bubble-status-text {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+}
+
+.bubble-card .bubble-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 0.25rem 0;
+}
+
+.bubble-card .bubble-owner {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 1rem 0;
+}
+
+.bubble-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.interests-preview {
+    color: #e63946;
+}
+
+.card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.card-actions .action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-actions .action-btn.leave {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.card-actions .action-btn.leave:hover {
+    background: #e5e7eb;
+}
+
+.card-actions .action-btn.close {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.card-actions .action-btn.close:hover {
+    background: #fee2e2;
+}
+
+.owner-label {
+    font-size: 0.75rem;
+    color: #d97706;
+    background: #fef3c7;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+    .my-bubbles-main {
+        padding: 1rem;
+    }
+
+    .bubbles-grid {
+        grid-template-columns: 1fr;
+    }
+}

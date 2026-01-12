@@ -1,0 +1,225 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 400px;
+    background: transparent;
+    z-index: 2000;
+    padding: 1rem;
+    padding-top: 80px;
+    animation: slideIn 0.3s ease;
+    pointer-events: none;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.create-modal {
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    pointer-events: all;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.modal-form {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.modal-error {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-field input[type="text"] {
+    padding: 0.875rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-field input[type="text"]:focus {
+    border-color: #e63946;
+    box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+}
+
+.location-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+    background: #dcfce7;
+    border-radius: 12px;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+.location-prompt {
+    padding: 0.875rem 1rem;
+    background: #fef3c7;
+    border-radius: 12px;
+    color: #d97706;
+    font-size: 0.9rem;
+}
+
+.slider {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    appearance: none;
+    cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(230, 57, 70, 0.4);
+}
+
+.visibility-options {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.vis-option {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vis-option:hover {
+    border-color: #e63946;
+}
+
+.vis-option.active {
+    border-color: #e63946;
+    background: #fff0f0;
+    color: #e63946;
+}
+
+.interests-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.interest-btn {
+    padding: 0.5rem 0.875rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.interest-btn:hover {
+    border-color: #e63946;
+}
+
+.interest-btn.active {
+    border-color: #e63946;
+    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    color: white;
+}
+
+.create-btn {
+    padding: 1rem;
+    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.create-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(230, 57, 70, 0.3);
+}
+
+.create-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
