@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import BubbleMarker from './BubbleMarker';
 import 'leaflet/dist/leaflet.css';
@@ -14,9 +14,17 @@ const pinIcon = L.divIcon({
     html: `<div style="width: 30px; height: 30px; background: #e63946; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
     iconSize: [30, 30],
     iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
 });
 
-export default function MapView({ bubbles, onBubbleClick, onMapClick, selectingLocation, selectedLocation }) {
+export default function MapView({
+    bubbles,
+    onBubbleClick,
+    onMapClick,
+    selectedLocation,
+    onAddBubbleClick,
+    isAuthenticated
+}) {
     return (
         <MapContainer
             center={RABAT_CENTER}
@@ -37,18 +45,32 @@ export default function MapView({ bubbles, onBubbleClick, onMapClick, selectingL
             ))}
 
             {selectedLocation && (
-                <Marker position={[selectedLocation.lat, selectedLocation.lng]} icon={pinIcon} />
+                <Marker position={[selectedLocation.lat, selectedLocation.lng]} icon={pinIcon}>
+                    {isAuthenticated && (
+                        <Popup className="add-bubble-popup">
+                            <div className="add-bubble-popup-content">
+                                <p>Create a bubble here?</p>
+                                <button
+                                    className="add-bubble-popup-btn"
+                                    onClick={() => onAddBubbleClick?.()}
+                                >
+                                    + Add Bubble
+                                </button>
+                            </div>
+                        </Popup>
+                    )}
+                </Marker>
             )}
 
-            {selectingLocation && <LocationSelector onSelect={onMapClick} />}
+            <MapClickHandler onMapClick={onMapClick} />
         </MapContainer>
     );
 }
 
-function LocationSelector({ onSelect }) {
+function MapClickHandler({ onMapClick }) {
     useMapEvents({
         click: (e) => {
-            onSelect?.({ lat: e.latlng.lat, lng: e.latlng.lng });
+            onMapClick?.({ lat: e.latlng.lat, lng: e.latlng.lng });
         },
     });
     return null;

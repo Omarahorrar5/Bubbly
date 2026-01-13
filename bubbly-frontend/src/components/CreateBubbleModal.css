@@ -223,3 +223,67 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        width: 100%;
+        padding: 0.5rem;
+        padding-top: 70px;
+    }
+
+    .create-modal {
+        max-height: calc(100vh - 80px);
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 0.25rem;
+        padding-top: 60px;
+    }
+
+    .create-modal {
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        padding: 1rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal-form {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .form-field label {
+        font-size: 0.8rem;
+    }
+
+    .form-field input[type="text"] {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .visibility-options {
+        gap: 0.5rem;
+    }
+
+    .vis-option {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .interest-btn {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.75rem;
+    }
+
+    .create-btn {
+        padding: 0.85rem;
+        font-size: 0.9rem;
+    }
+}

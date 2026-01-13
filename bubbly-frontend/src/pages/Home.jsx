@@ -13,7 +13,6 @@ export default function Home() {
     const [bubbles, setBubbles] = useState([]);
     const [selectedBubble, setSelectedBubble] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [selectingLocation, setSelectingLocation] = useState(false);
     const [newBubbleLocation, setNewBubbleLocation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -36,6 +35,8 @@ export default function Home() {
     }
 
     async function handleBubbleClick(bubble) {
+        // Clear any selected location when clicking a bubble
+        setNewBubbleLocation(null);
         try {
             const data = await bubblesAPI.getById(bubble.id);
             setSelectedBubble(data.bubble);
@@ -45,29 +46,28 @@ export default function Home() {
         }
     }
 
-    function handleCreateClick() {
-        setSelectingLocation(true);
-        setShowCreateModal(true);
+    function handleMapClick(location) {
+        // When clicking on the map, set the location for potential bubble creation
+        setNewBubbleLocation(location);
+        // Close any open bubble panel
+        setSelectedBubble(null);
     }
 
-    function handleMapClick(location) {
-        if (selectingLocation) {
-            setNewBubbleLocation(location);
-        }
+    function handleAddBubbleClick() {
+        // When clicking "Add Bubble" in the popup, open the modal
+        setShowCreateModal(true);
     }
 
     async function handleCreateBubble(bubbleData) {
         await bubblesAPI.create(bubbleData);
         setShowCreateModal(false);
-        setSelectingLocation(false);
         setNewBubbleLocation(null);
         loadBubbles();
     }
 
     function handleCloseCreateModal() {
         setShowCreateModal(false);
-        setSelectingLocation(false);
-        setNewBubbleLocation(null);
+        // Don't clear location so user can try again
     }
 
     async function handleLogout() {
@@ -111,9 +111,6 @@ export default function Home() {
                 <div className="header-right">
                     {isAuthenticated ? (
                         <>
-                            <button className="create-bubble-btn" onClick={handleCreateClick}>
-                                + Create Bubble
-                            </button>
                             <div className="user-menu">
                                 <div className="user-avatar">
                                     {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -138,12 +135,6 @@ export default function Home() {
             </header>
 
             <main className="home-main">
-                {selectingLocation && (
-                    <div className="location-hint">
-                        Click anywhere on the map to place your bubble
-                    </div>
-                )}
-
                 <div className="map-wrapper">
                     {loading ? (
                         <div className="map-loading">
@@ -155,8 +146,9 @@ export default function Home() {
                             bubbles={bubbles}
                             onBubbleClick={handleBubbleClick}
                             onMapClick={handleMapClick}
-                            selectingLocation={selectingLocation}
                             selectedLocation={newBubbleLocation}
+                            onAddBubbleClick={handleAddBubbleClick}
+                            isAuthenticated={isAuthenticated}
                         />
                     )}
                 </div>

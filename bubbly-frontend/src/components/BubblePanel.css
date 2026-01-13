@@ -253,4 +253,41 @@
     .bubble-panel {
         width: 100%;
     }
+
+    .panel-content {
+        padding: 1rem;
+    }
+
+    .bubble-title {
+        font-size: 1.25rem;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .info-label {
+        font-size: 0.65rem;
+    }
+
+    .info-value {
+        font-size: 0.95rem;
+    }
+
+    .member-item {
+        padding: 0.4rem;
+    }
+
+    .member-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
 }

@@ -310,4 +310,83 @@
         padding: 0.5rem 1rem;
         font-size: 0.8rem;
     }
+
+    .logo-small h1 {
+        font-size: 1rem;
+    }
+
+    .logo-bubble-small {
+        width: 24px;
+        height: 24px;
+    }
+
+    .filter-tabs {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filter-tab {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .user-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+
+    .home-main {
+        padding: 0.5rem;
+    }
+
+    .bubble-count {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .location-hint {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        top: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-header {
+        padding: 0.4rem 0.5rem;
+    }
+
+    .create-bubble-btn {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .login-link {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .user-dropdown {
+        right: -0.5rem;
+        min-width: 150px;
+    }
+
+    .filter-tab {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .home-main {
+        padding: 0;
+    }
+
+    .map-wrapper {
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .bubble-count {
+        display: none;
+    }
 }
