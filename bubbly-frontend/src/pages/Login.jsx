@@ -34,7 +34,7 @@ export default function Login() {
                         <span className="logo-bubble"></span>
                         <h1>Bubbly</h1>
                     </div>
-                    <p className="subtitle">Connect with people around you</p>
+                    <p className="subtitle">Bubble in. Hang out. Remember.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="login-form">
