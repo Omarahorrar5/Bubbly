@@ -1,4 +1,5 @@
 import { Marker, Popup } from 'react-leaflet';
+import { useRef } from 'react';
 import L from 'leaflet';
 import './BubbleMarker.css';
 
@@ -25,13 +26,18 @@ function createBubbleIcon(isOpen) {
 export default function BubbleMarker({ bubble, onClick }) {
     const position = [parseFloat(bubble.latitude), parseFloat(bubble.longitude)];
     const isOpen = bubble.status === 'open';
+    const markerRef = useRef(null);
 
     return (
         <Marker
             position={position}
             icon={createBubbleIcon(isOpen)}
+            ref={markerRef}
             eventHandlers={{
                 click: onClick,
+                mouseover: () => {
+                    markerRef.current?.openPopup();
+                },
             }}
         >
             <Popup>

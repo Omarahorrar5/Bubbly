@@ -15,17 +15,16 @@ export default function Home() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newBubbleLocation, setNewBubbleLocation] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all');
 
     useEffect(() => {
         loadBubbles();
-    }, [filter]);
+    }, []);
 
     async function loadBubbles() {
         setLoading(true);
         try {
-            const status = filter === 'all' ? undefined : filter;
-            const data = await bubblesAPI.getAll(status);
+            // Always load only open bubbles
+            const data = await bubblesAPI.getAll('open');
             setBubbles(data.bubbles || []);
         } catch (err) {
             console.error('Failed to load bubbles:', err);
@@ -86,29 +85,9 @@ export default function Home() {
                 </div>
 
                 <div className="header-center">
-                    <div className="filter-tabs">
-                        <button
-                            className={`filter-tab ${filter === 'all' ? 'active' : ''}`}
-                            onClick={() => setFilter('all')}
-                        >
-                            All
-                        </button>
-                        <button
-                            className={`filter-tab ${filter === 'open' ? 'active' : ''}`}
-                            onClick={() => setFilter('open')}
-                        >
-                            Open
-                        </button>
-                        <button
-                            className={`filter-tab ${filter === 'closed' ? 'active' : ''}`}
-                            onClick={() => setFilter('closed')}
-                        >
-                            Closed
-                        </button>
-                    </div>
                     {!loading && (
                         <span className="bubble-count-badge">
-                            {bubbles.length} bubble{bubbles.length !== 1 ? 's' : ''}
+                            {bubbles.length} open bubble{bubbles.length !== 1 ? 's' : ''}
                         </span>
                     )}
                 </div>

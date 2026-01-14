@@ -4,12 +4,7 @@
 }
 
 .bubble-marker {
-    transition: transform 0.2s ease;
     cursor: pointer;
-}
-
-.bubble-marker:hover {
-    transform: scale(1.2);
 }
 
 .bubble-marker.open svg circle:first-child {
