@@ -1,5 +1,5 @@
 import { Marker, Popup } from 'react-leaflet';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import L from 'leaflet';
 import './BubbleMarker.css';
 
@@ -27,6 +27,46 @@ export default function BubbleMarker({ bubble, onClick }) {
     const position = [parseFloat(bubble.latitude), parseFloat(bubble.longitude)];
     const isOpen = bubble.status === 'open';
     const markerRef = useRef(null);
+    const closeTimeoutRef = useRef(null);
+    const popupRef = useRef(null);
+
+    // Clear timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (closeTimeoutRef.current) {
+                clearTimeout(closeTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    function handleMouseOver() {
+        // Cancel any pending close
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+        markerRef.current?.openPopup();
+    }
+
+    function handleMouseOut() {
+        // Delay close to allow moving to popup
+        closeTimeoutRef.current = setTimeout(() => {
+            markerRef.current?.closePopup();
+        }, 100);
+    }
+
+    function handlePopupMouseEnter() {
+        // Cancel close when entering popup
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+    }
+
+    function handlePopupMouseLeave() {
+        // Close popup when leaving it
+        markerRef.current?.closePopup();
+    }
 
     return (
         <Marker
@@ -35,13 +75,16 @@ export default function BubbleMarker({ bubble, onClick }) {
             ref={markerRef}
             eventHandlers={{
                 click: onClick,
-                mouseover: () => {
-                    markerRef.current?.openPopup();
-                },
+                mouseover: handleMouseOver,
+                mouseout: handleMouseOut,
             }}
         >
-            <Popup>
-                <div className="bubble-popup">
+            <Popup ref={popupRef}>
+                <div
+                    className="bubble-popup"
+                    onMouseEnter={handlePopupMouseEnter}
+                    onMouseLeave={handlePopupMouseLeave}
+                >
                     <h3 className="bubble-popup-title">{bubble.title}</h3>
                     <p className="bubble-popup-owner">by {bubble.owner_name}</p>
                     <div className="bubble-popup-meta">
