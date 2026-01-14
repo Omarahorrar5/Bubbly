@@ -1,18 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { bubblesAPI } from '../services/api';
+import { bubblesAPI, messagesAPI } from '../services/api';
 import './BubblePanel.css';
 
 export default function BubblePanel({ bubble, onClose, onUpdate }) {
     const { user, isAuthenticated } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showChat, setShowChat] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [chatLoading, setChatLoading] = useState(false);
+    const [sendingMessage, setSendingMessage] = useState(false);
+    const messagesEndRef = useRef(null);
 
-    if (!bubble) return null;
+    const isOwner = user?.id === bubble?.owner_id;
+    const isMember = bubble?.members?.some(m => m.id === user?.id);
+    const isOpen = bubble?.status === 'open';
 
-    const isOwner = user?.id === bubble.owner_id;
-    const isMember = bubble.members?.some(m => m.id === user?.id);
-    const isOpen = bubble.status === 'open';
+    useEffect(() => {
+        if (showChat && isMember && bubble?.id) {
+            loadMessages();
+        }
+    }, [showChat, bubble?.id, isMember]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    function scrollToBottom() {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function loadMessages() {
+        setChatLoading(true);
+        try {
+            const data = await messagesAPI.getBubbleMessages(bubble.id);
+            setMessages(data.messages || []);
+        } catch (err) {
+            console.error('Failed to load messages:', err);
+        } finally {
+            setChatLoading(false);
+        }
+    }
+
+    async function handleSendMessage(e) {
+        e.preventDefault();
+        if (!newMessage.trim() || sendingMessage) return;
+
+        setSendingMessage(true);
+        try {
+            await messagesAPI.sendMessage(bubble.id, newMessage.trim());
+            setNewMessage('');
+            await loadMessages();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setSendingMessage(false);
+        }
+    }
 
     async function handleJoin() {
         setLoading(true);
@@ -32,6 +78,7 @@ export default function BubblePanel({ bubble, onClose, onUpdate }) {
         setError('');
         try {
             await bubblesAPI.leave(bubble.id);
+            setShowChat(false);
             onUpdate?.();
         } catch (err) {
             setError(err.message);
@@ -53,6 +100,13 @@ export default function BubblePanel({ bubble, onClose, onUpdate }) {
             setLoading(false);
         }
     }
+
+    function formatTime(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    if (!bubble) return null;
 
     return (
         <div className="bubble-panel">
@@ -90,7 +144,7 @@ export default function BubblePanel({ bubble, onClose, onUpdate }) {
                     </div>
                 </div>
 
-                {bubble.members?.length > 0 && (
+                {bubble.members?.length > 0 && !showChat && (
                     <div className="members-section">
                         <h4>Members</h4>
                         <div className="members-list">
@@ -111,10 +165,66 @@ export default function BubblePanel({ bubble, onClose, onUpdate }) {
                     </div>
                 )}
 
+                {/* Chat Section - Only for members of open bubbles */}
+                {isAuthenticated && isMember && isOpen && showChat && (
+                    <div className="chat-section">
+                        <div className="chat-header">
+                            <h4>Chat</h4>
+                            <button className="chat-back-btn" onClick={() => setShowChat(false)}>
+                                ← Back
+                            </button>
+                        </div>
+                        <div className="chat-messages">
+                            {chatLoading ? (
+                                <div className="chat-loading">Loading messages...</div>
+                            ) : messages.length === 0 ? (
+                                <div className="chat-empty">No messages yet. Start the conversation!</div>
+                            ) : (
+                                messages.map((msg) => (
+                                    <div
+                                        key={msg.id}
+                                        className={`chat-message ${msg.sender_id === user?.id ? 'own' : ''}`}
+                                    >
+                                        <div className="message-sender">{msg.sender_name}</div>
+                                        <div className="message-content">{msg.content}</div>
+                                        <div className="message-time">{formatTime(msg.created_at)}</div>
+                                    </div>
+                                ))
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+                        <form className="chat-input-form" onSubmit={handleSendMessage}>
+                            <input
+                                type="text"
+                                className="chat-input"
+                                placeholder="Type a message..."
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                disabled={sendingMessage}
+                            />
+                            <button
+                                type="submit"
+                                className="chat-send-btn"
+                                disabled={sendingMessage || !newMessage.trim()}
+                            >
+                                {sendingMessage ? '...' : '→'}
+                            </button>
+                        </form>
+                    </div>
+                )}
+
                 {error && <div className="panel-error">{error}</div>}
 
                 {isAuthenticated && isOpen && (
                     <div className="panel-actions">
+                        {isMember && !showChat && (
+                            <button
+                                className="action-btn chat"
+                                onClick={() => setShowChat(true)}
+                            >
+                                Open Chat
+                            </button>
+                        )}
                         {!isMember && (
                             <button
                                 className="action-btn join"

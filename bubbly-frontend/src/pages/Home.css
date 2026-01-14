@@ -56,7 +56,9 @@
 .header-center {
     flex: 2;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .filter-tabs {
@@ -87,6 +89,12 @@
     background: white;
     color: #e63946;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.bubble-count-badge {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 .header-right {
@@ -283,10 +291,7 @@
 }
 
 .bubble-count {
-    text-align: center;
-    padding: 1rem;
-    color: #6b7280;
-    font-size: 0.9rem;
+    display: none;
 }
 
 /* Responsive */
@@ -340,9 +345,8 @@
         padding: 0.5rem;
     }
 
-    .bubble-count {
-        padding: 0.5rem;
-        font-size: 0.8rem;
+    .bubble-count-badge {
+        font-size: 0.7rem;
     }
 
     .location-hint {
@@ -386,7 +390,7 @@
         box-shadow: none;
     }
 
-    .bubble-count {
+    .bubble-count-badge {
         display: none;
     }
 }

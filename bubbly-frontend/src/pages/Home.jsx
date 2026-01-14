@@ -106,6 +106,11 @@ export default function Home() {
                             Closed
                         </button>
                     </div>
+                    {!loading && (
+                        <span className="bubble-count-badge">
+                            {bubbles.length} bubble{bubbles.length !== 1 ? 's' : ''}
+                        </span>
+                    )}
                 </div>
 
                 <div className="header-right">
@@ -153,9 +158,7 @@ export default function Home() {
                     )}
                 </div>
 
-                <div className="bubble-count">
-                    {bubbles.length} bubble{bubbles.length !== 1 ? 's' : ''} in Rabat
-                </div>
+
             </main>
 
             {selectedBubble && (
