@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./bubbly-backend
+    container_name: bubbly-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_NAME=bubbly
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - SESSION_SECRET=your_session_secret_key_here
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - bubbly-network
+
+  frontend:
+    build: ./bubbly-frontend
+    container_name: bubbly-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - bubbly-network
+
+networks:
+  bubbly-network:
+    driver: bridge
