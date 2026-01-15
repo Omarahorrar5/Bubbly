@@ -15,10 +15,24 @@ export default function Home() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newBubbleLocation, setNewBubbleLocation] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [filterMode, setFilterMode] = useState('suggested');
 
     useEffect(() => {
         loadBubbles();
     }, []);
+
+    // Check for pending bubble creation after login
+    useEffect(() => {
+        if (isAuthenticated) {
+            const pendingLocation = sessionStorage.getItem('pendingBubbleLocation');
+            if (pendingLocation) {
+                const location = JSON.parse(pendingLocation);
+                setNewBubbleLocation(location);
+                setShowCreateModal(true);
+                sessionStorage.removeItem('pendingBubbleLocation');
+            }
+        }
+    }, [isAuthenticated]);
 
     async function loadBubbles() {
         setLoading(true);
@@ -53,6 +67,15 @@ export default function Home() {
     }
 
     function handleAddBubbleClick() {
+        // Redirect to login if not authenticated
+        if (!isAuthenticated) {
+            // Save location for after login
+            if (newBubbleLocation) {
+                sessionStorage.setItem('pendingBubbleLocation', JSON.stringify(newBubbleLocation));
+            }
+            navigate('/login');
+            return;
+        }
         // When clicking "Add Bubble" in the popup, open the modal
         setShowCreateModal(true);
     }
@@ -85,11 +108,20 @@ export default function Home() {
                 </div>
 
                 <div className="header-center">
-                    {!loading && (
-                        <span className="bubble-count-badge">
-                            {bubbles.length} open bubble{bubbles.length !== 1 ? 's' : ''}
-                        </span>
-                    )}
+                    <div className="filter-switch">
+                        <button
+                            className={`filter-option ${filterMode === 'suggested' ? 'active' : ''}`}
+                            onClick={() => setFilterMode('suggested')}
+                        >
+                            Suggested
+                        </button>
+                        <button
+                            className={`filter-option ${filterMode === 'all' ? 'active' : ''}`}
+                            onClick={() => setFilterMode('all')}
+                        >
+                            All
+                        </button>
+                    </div>
                 </div>
 
                 <div className="header-right">

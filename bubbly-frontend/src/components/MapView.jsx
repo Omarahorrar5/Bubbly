@@ -46,19 +46,17 @@ export default function MapView({
 
             {selectedLocation && (
                 <Marker position={[selectedLocation.lat, selectedLocation.lng]} icon={pinIcon}>
-                    {isAuthenticated && (
-                        <Popup className="add-bubble-popup">
-                            <div className="add-bubble-popup-content">
-                                <p>Create a bubble here?</p>
-                                <button
-                                    className="add-bubble-popup-btn"
-                                    onClick={() => onAddBubbleClick?.()}
-                                >
-                                    + Add Bubble
-                                </button>
-                            </div>
-                        </Popup>
-                    )}
+                    <Popup className="add-bubble-popup">
+                        <div className="add-bubble-popup-content">
+                            <p>Create a bubble here?</p>
+                            <button
+                                className="add-bubble-popup-btn"
+                                onClick={() => onAddBubbleClick?.()}
+                            >
+                                + Add Bubble
+                            </button>
+                        </div>
+                    </Popup>
                 </Marker>
             )}
 
