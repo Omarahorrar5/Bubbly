@@ -11,8 +11,10 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1.5rem;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(230, 57, 70, 0.1);
     position: relative;
     z-index: 1000;
 }
@@ -92,9 +94,14 @@
 }
 
 .bubble-count-badge {
-    font-size: 0.8rem;
-    color: #6b7280;
-    font-weight: 500;
+    font-size: 0.9rem;
+    color: white;
+    font-weight: 600;
+    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+    letter-spacing: 0.3px;
 }
 
 .header-right {
@@ -203,20 +210,21 @@
 }
 
 .login-link {
-    padding: 0.625rem 1.25rem;
-    border: 2px solid #e63946;
-    background: transparent;
-    color: #e63946;
+    padding: 0.625rem 1.5rem;
+    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    color: white;
+    border: none;
     border-radius: 10px;
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.25);
 }
 
 .login-link:hover {
-    background: #e63946;
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 57, 70, 0.35);
 }
 
 /* Main Content */
