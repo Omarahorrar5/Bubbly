@@ -5,6 +5,12 @@ const AuthController = require('../controllers/authController');
 // Login
 router.post('/login', AuthController.login);
 
+// Register
+router.post('/register', AuthController.register);
+
+// Save user interests
+router.post('/interests', AuthController.saveInterests);
+
 // Logout
 router.post('/logout', AuthController.logout);
 

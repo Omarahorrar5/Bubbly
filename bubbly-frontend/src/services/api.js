@@ -11,79 +11,91 @@ async function request(endpoint, options = {}) {
   });
 
   const data = await response.json();
-  
+
   if (!response.ok) {
     throw new Error(data.error || 'Something went wrong');
   }
-  
+
   return data;
 }
 
 // Auth API
 export const authAPI = {
-  login: (email, password) => 
+  login: (email, password) =>
     request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
-  
-  logout: () => 
+
+  register: (name, email, password, sex, age) =>
+    request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, sex, age }),
+    }),
+
+  saveInterests: (interestIds) =>
+    request('/auth/interests', {
+      method: 'POST',
+      body: JSON.stringify({ interestIds }),
+    }),
+
+  logout: () =>
     request('/auth/logout', { method: 'POST' }),
-  
-  getCurrentUser: () => 
+
+  getCurrentUser: () =>
     request('/auth/me'),
 };
 
 // Bubbles API
 export const bubblesAPI = {
-  getAll: (status) => 
+  getAll: (status) =>
     request(`/bubbles${status ? `?status=${status}` : ''}`),
-  
-  getById: (id) => 
+
+  getById: (id) =>
     request(`/bubbles/${id}`),
-  
-  getMyBubbles: () => 
+
+  getMyBubbles: () =>
     request('/bubbles/my'),
-  
-  create: (bubbleData) => 
+
+  create: (bubbleData) =>
     request('/bubbles', {
       method: 'POST',
       body: JSON.stringify(bubbleData),
     }),
-  
-  join: (id) => 
+
+  join: (id) =>
     request(`/bubbles/${id}/join`, { method: 'POST' }),
-  
-  leave: (id) => 
+
+  leave: (id) =>
     request(`/bubbles/${id}/leave`, { method: 'POST' }),
-  
-  close: (id) => 
+
+  close: (id) =>
     request(`/bubbles/${id}/close`, { method: 'POST' }),
 };
 
 // Messages API
 export const messagesAPI = {
-  getBubbleMessages: (bubbleId) => 
+  getBubbleMessages: (bubbleId) =>
     request(`/messages/${bubbleId}`),
-  
-  sendMessage: (bubbleId, content) => 
+
+  sendMessage: (bubbleId, content) =>
     request(`/messages/${bubbleId}`, {
       method: 'POST',
       body: JSON.stringify({ content }),
     }),
-  
-  getRecent: () => 
+
+  getRecent: () =>
     request('/messages'),
 };
 
 // Interests API
 export const interestsAPI = {
-  getAll: () => 
+  getAll: () =>
     request('/interests'),
-  
-  getCategories: () => 
+
+  getCategories: () =>
     request('/interests/categories'),
-  
-  getByCategory: (category) => 
+
+  getByCategory: (category) =>
     request(`/interests/category/${category}`),
 };

@@ -31,6 +31,30 @@ class User {
     `, [userId]);
     return result.rows;
   }
+
+  static async create(name, email, password, sex, age) {
+    const result = await query(
+      `INSERT INTO users (name, email, password, sex, age, created_at) 
+       VALUES ($1, $2, $3, $4, $5, NOW()) 
+       RETURNING id, name, email, sex, age, created_at`,
+      [name, email, password, sex, age]
+    );
+    return result.rows[0];
+  }
+
+  static async addInterests(userId, interestIds) {
+    if (!interestIds || interestIds.length === 0) return [];
+
+    const values = interestIds.map((id, i) => `($1, $${i + 2})`).join(', ');
+    const params = [userId, ...interestIds];
+
+    await query(
+      `INSERT INTO user_interests (user_id, interest_id) VALUES ${values}
+       ON CONFLICT (user_id, interest_id) DO NOTHING`,
+      params
+    );
+    return interestIds;
+  }
 }
 
 module.exports = User;
