@@ -235,12 +235,3 @@ curl -X POST http://localhost:3000/api/recommendations/train
 ```
 
 ---
-
-## Environment Variables
-
-Add to `.env`:
-```
-ML_SERVICE_URL=http://localhost:5001
-```
-
----
