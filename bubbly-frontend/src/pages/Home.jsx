@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { bubblesAPI } from '../services/api';
+import { bubblesAPI, recommendationsAPI } from '../services/api';
 import MapView from '../components/MapView';
 import BubblePanel from '../components/BubblePanel';
 import CreateBubbleModal from '../components/CreateBubbleModal';
@@ -19,7 +19,7 @@ export default function Home() {
 
     useEffect(() => {
         loadBubbles();
-    }, []);
+    }, [filterMode, isAuthenticated]);
 
     // Check for pending bubble creation after login
     useEffect(() => {
@@ -37,8 +37,21 @@ export default function Home() {
     async function loadBubbles() {
         setLoading(true);
         try {
-            // Always load only open bubbles
-            const data = await bubblesAPI.getAll('open');
+            let data;
+
+            if (filterMode === 'suggested' && isAuthenticated) {
+                // Use ML-based recommendations for authenticated users
+                try {
+                    data = await recommendationsAPI.getSuggested();
+                } catch (recError) {
+                    console.log('Recommendations unavailable, falling back to all open bubbles');
+                    data = await bubblesAPI.getAll('open');
+                }
+            } else {
+                // Load all open bubbles
+                data = await bubblesAPI.getAll('open');
+            }
+
             setBubbles(data.bubbles || []);
         } catch (err) {
             console.error('Failed to load bubbles:', err);

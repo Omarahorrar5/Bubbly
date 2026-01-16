@@ -100,3 +100,15 @@ export const interestsAPI = {
   getByCategory: (category) =>
     request(`/interests/category/${category}`),
 };
+
+// Recommendations API
+export const recommendationsAPI = {
+  getSuggested: () =>
+    request('/recommendations'),
+
+  trainModel: () =>
+    request('/recommendations/train', { method: 'POST' }),
+
+  getHealth: () =>
+    request('/recommendations/health'),
+};

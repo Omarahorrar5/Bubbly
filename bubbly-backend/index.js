@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const bubbleRoutes = require('./routes/bubbleRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const interestRoutes = require('./routes/interestRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 // Import database connection
 const { connectDB } = require('./utils/database');
@@ -49,6 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bubbles', bubbleRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/interests', interestRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
