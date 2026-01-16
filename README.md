@@ -53,9 +53,7 @@ This document describes the machine learning-based recommendation system added t
 
 ---
 
-## Files Added/Modified
-
-### New Files
+## Files Added
 
 | File | Purpose |
 |------|---------|
