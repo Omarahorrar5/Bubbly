@@ -5,7 +5,7 @@ import './BubbleMarker.css';
 
 // Create custom bubble icon
 function createBubbleIcon(isOpen) {
-    const color = isOpen ? '#e63946' : '#9ca3af';
+    const color = isOpen ? '#16a34a' : '#9ca3af';
 
     return L.divIcon({
         className: 'bubble-marker-icon',

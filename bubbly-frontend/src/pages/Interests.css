@@ -3,7 +3,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #20153b 0%, #3d2a6e 100%);
     padding: 2rem 1rem;
 }
 
@@ -32,7 +32,7 @@
 .interests-page .logo-bubble {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #20153b 0%, #3d2a6e 100%);
     border-radius: 50%;
     position: relative;
 }
@@ -128,12 +128,12 @@
 }
 
 .interest-chip:hover {
-    border-color: #e63946;
-    color: #e63946;
+    border-color: #20153b;
+    color: #20153b;
 }
 
 .interest-chip.selected {
-    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #20153b 0%, #3d2a6e 100%);
     border-color: transparent;
     color: white;
 }
@@ -158,7 +158,7 @@
 .continue-button {
     width: 100%;
     padding: 1rem;
-    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #20153b 0%, #3d2a6e 100%);
     color: white;
     border: none;
     border-radius: 12px;
@@ -170,7 +170,7 @@
 
 .continue-button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(230, 57, 70, 0.3);
+    box-shadow: 0 10px 20px rgba(32, 21, 59, 0.3);
 }
 
 .continue-button:disabled {
@@ -189,7 +189,7 @@
 }
 
 .skip-button:hover:not(:disabled) {
-    color: #e63946;
+    color: #20153b;
 }
 
 .skip-button:disabled {

@@ -60,7 +60,7 @@
 .add-bubble-popup-btn {
     width: 100%;
     padding: 0.6rem 1rem;
-    background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+    background: linear-gradient(135deg, #20153b 0%, #3d2a6e 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -72,5 +72,5 @@
 
 .add-bubble-popup-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+    box-shadow: 0 4px 12px rgba(32, 21, 59, 0.3);
 }
