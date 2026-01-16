@@ -65,14 +65,6 @@ This document describes the machine learning-based recommendation system added t
 | `bubbly-backend/controllers/recommendationController.js` | Backend controller for recommendations |
 | `bubbly-backend/routes/recommendationRoutes.js` | API routes for recommendations |
 
-### Modified Files
-
-| File | Changes |
-|------|---------|
-| `bubbly-backend/index.js` | Added recommendation routes |
-| `bubbly-frontend/src/services/api.js` | Added `recommendationsAPI` |
-| `bubbly-frontend/src/pages/Home.jsx` | Added Suggested/All toggle and ML integration |
-
 ---
 
 ## XGBoost Model Details
@@ -252,22 +244,3 @@ ML_SERVICE_URL=http://localhost:5001
 ```
 
 ---
-
-## Dependencies
-
-### Python (ml/requirements.txt)
-```
-flask
-flask-cors
-xgboost
-pandas
-numpy
-scikit-learn
-psycopg2-binary
-python-dotenv
-```
-
-### Node.js
-```
-node-fetch (for calling ML service)
-```
