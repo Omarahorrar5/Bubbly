@@ -8,13 +8,29 @@ services:
       - "3000:3000"
     environment:
       - PORT=3000
-      - DB_HOST=host.docker.internal
-      - DB_PORT=5432
-      - DB_NAME=bubbly
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - SESSION_SECRET=your_session_secret_key_here
-      - NODE_ENV=production
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-bubbly}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - SESSION_SECRET=${SESSION_SECRET:-your_session_secret_key_here}
+      - NODE_ENV=${NODE_ENV:-production}
+      - ML_SERVICE_URL=http://ml-service:5001
+    restart: unless-stopped
+    networks:
+      - bubbly-network
+
+  ml-service:
+    build: ./bubbly-backend/ml
+    container_name: bubbly-ml
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-bubbly}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
     restart: unless-stopped
     networks:
       - bubbly-network
@@ -26,6 +42,7 @@ services:
       - "80:80"
     depends_on:
       - backend
+      - ml-service
     restart: unless-stopped
     networks:
       - bubbly-network
