@@ -16,7 +16,7 @@ export default function Interests() {
             try {
                 const data = await interestsAPI.getAll();
                 setInterests(data.interests || []);
-            } catch (err) {
+            } catch {
                 setError('Failed to load interests');
             } finally {
                 setLoading(false);

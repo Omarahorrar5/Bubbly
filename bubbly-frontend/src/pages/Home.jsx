@@ -43,7 +43,7 @@ export default function Home() {
                 // Use ML-based recommendations for authenticated users
                 try {
                     data = await recommendationsAPI.getSuggested();
-                } catch (recError) {
+                } catch {
                     console.log('Recommendations unavailable, falling back to all open bubbles');
                     data = await bubblesAPI.getAll('open');
                 }

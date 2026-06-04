@@ -22,8 +22,7 @@ export default function MapView({
     onBubbleClick,
     onMapClick,
     selectedLocation,
-    onAddBubbleClick,
-    isAuthenticated
+    onAddBubbleClick
 }) {
     return (
         <MapContainer
