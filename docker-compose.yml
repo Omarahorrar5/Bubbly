@@ -43,6 +43,7 @@ services:
       - "80:80"
     depends_on:
       - backend
+      - ml-service
     restart: unless-stopped
     networks:
       - bubbly-network
