@@ -1,235 +1,164 @@
-# XGBoost Bubble Recommendation Feature
+# Bubbly - Social Bubble Application
 
-## Overview
+Bubbly is a multi-tier social network web application designed to help users locate, create, and join local "bubbles" (interest-based community groups) on an interactive map. Recommendations are personalized using an integrated XGBoost machine learning model.
 
-This document describes the machine learning-based recommendation system added to Bubbly. The system uses **XGBoost** (Extreme Gradient Boosting) to predict which bubbles a user will be interested in, based on interest overlap and user behavior patterns.
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                           FRONTEND                                   │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  Home.jsx                                                    │    │
-│  │  - Toggle: "Suggested" / "All"                               │    │
-│  │  - Calls recommendationsAPI.getSuggested() for ML recs       │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                           BACKEND (Node.js :3000)                    │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  routes/recommendationRoutes.js                              │    │
-│  │  - GET /api/recommendations → getRecommendations             │    │
-│  │  - POST /api/recommendations/train → trainModel              │    │
-│  │  - GET /api/recommendations/health → getHealth               │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  controllers/recommendationController.js                     │    │
-│  │  - Calls ML service for predictions                          │    │
-│  │  - Fallback to interest-based ranking if ML unavailable      │    │
-│  │  - Excludes owned and joined bubbles                         │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                       ML SERVICE (Flask :5001)                       │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  ml/recommendation_service.py                                │    │
-│  │  - /train: Train XGBoost model on closed bubbles             │    │
-│  │  - /predict: Score open bubbles for user                     │    │
-│  │  - /health: Check if model is loaded                         │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  ml/model.pkl                                                │    │
-│  │  - Serialized XGBoost model + interest IDs                   │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────┘
-```
+The project is built on a modern containerized microservices architecture, provisioned with Terraform on AWS, and deployed automatically via a GitHub Actions CI/CD pipeline.
 
 ---
 
-## Files Added
+## 🏗️ System Architecture
 
-| File | Purpose |
-|------|---------|
-| `bubbly-backend/ml/recommendation_service.py` | Flask ML service with XGBoost training and prediction |
-| `bubbly-backend/ml/requirements.txt` | Python dependencies (xgboost, flask, pandas, etc.) |
-| `bubbly-backend/ml/model.pkl` | Trained model (generated after training) |
-| `bubbly-backend/controllers/recommendationController.js` | Backend controller for recommendations |
-| `bubbly-backend/routes/recommendationRoutes.js` | API routes for recommendations |
+```
+                    ┌──────────────────────────────┐
+                    │      React Frontend (S3)     │
+                    └──────────────┬───────────────┘
+                                   │ HTTPS / REST
+                                   ▼
+                    ┌──────────────────────────────┐
+                    │ Application Load Balancer    │
+                    └──────────────┬───────────────┘
+                                   │ HTTP (Port 80 -> 3000)
+                                   ▼
+                    ┌──────────────────────────────┐
+                    │   ECS Fargate Task (Node.js) │
+                    └──────────────┬───────────────┘
+                                   │ Private Subnet
+                                   ▼
+            ┌──────────────────────┴──────────────────────┐
+            │                                             │
+            ▼ (Port 5432)                                 ▼ (Port 5001)
+┌──────────────────────┐                       ┌──────────────────────┐
+│  RDS PostgreSQL DB   │                       │  ML Service (Flask)  │
+│  (Private Subnets)   │                       │  (XGBoost Model)     │
+└──────────────────────┘                       └──────────────────────┘
+```
+
+### Component Details
+1. **Frontend**: React application built with Vite and Leaflet maps, hosted as a static website on Amazon S3.
+2. **Backend**: Express (Node.js) REST API managing user authentication, map operations, messaging, and database operations.
+3. **ML Service**: Python (Flask) service loaded with an XGBoost Classifier that processes user interests and histories to generate personalized bubble suggestions.
+4. **Database**: Managed RDS PostgreSQL instance for relational storage.
 
 ---
 
-## XGBoost Model Details
+## 🌐 AWS Infrastructure (Terraform)
 
-### Training Data Source
-- **Closed bubbles**: Historical data where we know which users joined
-- Each training sample is a (user, bubble) pair
-- Label: 1 if user joined, 0 otherwise
+All resources are provisioned as Code using Terraform. The cloud architecture is highly secured, utilizing isolated private subnets.
 
-### Feature Engineering
-
-8 features per user-bubble pair:
-
-| # | Feature | Description | Example |
-|---|---------|-------------|---------|
-| 1 | `jaccard` | Jaccard similarity of interests | 0.42 |
-| 2 | `common_interests` | Count of shared interests | 3 |
-| 3 | `user_interest_count` | User's total interests | 5 |
-| 4 | `bubble_interest_count` | Bubble's total interests | 4 |
-| 5 | `user_age` | User's age | 25 |
-| 6 | `member_count` | Current bubble members | 7 |
-| 7 | `fill_rate` | member_count / max_members | 0.7 |
-| 8 | `days_old` | Bubble age in days | 14 |
-
-### Model Configuration
-
-```python
-model = xgb.XGBClassifier(
-    n_estimators=100,          # Number of boosting rounds
-    max_depth=6,               # Maximum tree depth
-    learning_rate=0.1,         # Step size shrinkage
-    scale_pos_weight=ratio,    # Handle class imbalance
-    eval_metric='logloss'      # Binary cross-entropy
-)
+```
++-----------------------------------------------------------------------------------+
+| AWS Cloud (us-east-1)                                                             |
+|                                                                                   |
+| +-------------------------------------------------------------------------------+ |
+| | Custom VPC (10.0.0.0/16)                                                      | |
+| |                                                                               | |
+| |  +-------------------------------------------------------------------------+  | |
+| |  | Public Subnets (10.0.1.0/24, 10.0.2.0/24)                               |  | |
+| |  |   [ Internet Gateway ] <---> [ Application Load Balancer (ALB) ]        |  | |
+| |  |                              [ NAT Gateway ]                            |  | |
+| |  +-------------------------------------------------------------------------+  | |
+| |                                     |                                         | |
+| |                                     v                                         | |
+| |  +-------------------------------------------------------------------------+  | |
+| |  | Private Subnets (10.0.10.0/24, 10.0.11.0/24)                            |  | |
+| |  |   [ ECS Fargate Containers (Node.js App) ]                              |  | |
+| |  +-------------------------------------------------------------------------+  | |
+| |                                     |                                         | |
+| |                                     v                                         | |
+| |  +-------------------------------------------------------------------------+  | |
+| |  | Private Database Subnets (10.0.20.0/24, 10.0.21.0/24)                   |  | |
+| |  |   [ RDS PostgreSQL Database (SSL Enforced) ]                            |  | |
+| |  +-------------------------------------------------------------------------+  | |
+| +-------------------------------------------------------------------------------+ |
++-----------------------------------------------------------------------------------+
 ```
 
-### Training Process
-
-```python
-# 1. Generate training data from closed bubbles
-X, y = generate_training_data()
-
-# 2. Split for validation
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
-
-# 3. Train model
-model.fit(X_train, y_train)
-
-# 4. Evaluate
-accuracy = accuracy_score(y_val, model.predict(X_val))
-auc = roc_auc_score(y_val, model.predict_proba(X_val)[:, 1])
-
-# 5. Save model
-pickle.dump({'model': model, 'all_interest_ids': all_interest_ids}, f)
-```
+### Infrastructure Security
+* **Network Isolation**: The RDS database has `publicly_accessible = false` and resides in isolated subnets with no public IP.
+* **Security Groups**: 
+  * The ALB accepts public HTTP traffic on port 80.
+  * ECS Fargate tasks accept traffic *only* from the ALB Security Group on port 3000.
+  * RDS PostgreSQL accepts connections *only* from Fargate tasks on port 5432.
+  * Outbound traffic from private subnets (e.g. to pull Docker images or connect to GitHub) is routed securely through a NAT Gateway.
 
 ---
 
-## API Endpoints
+## 🚀 DevOps CI/CD Pipeline
 
-### GET /api/recommendations
-Returns top 15 recommended bubbles for the authenticated user.
+We use GitHub Actions ([.github/workflows/ci-cd.yml](file:///.github/workflows/ci-cd.yml)) to run automated checks and deployments on every push to the `main` branch.
 
-**Response:**
-```json
-{
-  "bubbles": [
-    {
-      "id": "uuid",
-      "title": "Photography Club",
-      "owner_name": "John",
-      "member_count": 5,
-      "interests": ["photography", "art"]
-    }
-  ]
-}
+```
+ ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+ │  Git Push /  ├────>│ Lint & Test  ├────>│ Build & Sync ├────>│ Build & Push │
+ │  PR to main  │     │ (Node.js)    │     │ React (S3)   │     │ Docker (ECR) │
+ └──────────────┘     └──────────────┘     └──────────────┘     └──────┬───────┘
+                                                                       │
+                                                                       ▼
+ ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────┴───────┐
+ │ Live Site    │     │ ECS Service  │     │ Render Task  │     │ Download Task│
+ │ Updated!     │<────│ Redeployed   │<────│ Definition   │<────│ Def (ECS)    │
+ └──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
 ```
 
-### POST /api/recommendations/train
-Triggers model training (admin endpoint).
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Model training completed"
-}
-```
-
-### GET /api/recommendations/health
-Checks ML service status.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "mlService": {
-    "status": "healthy",
-    "model_loaded": true
-  }
-}
-```
+### Pipeline Jobs
+1. **Lint & Test**: Checks code quality for frontend and backend using ESLint and runs package validation tests under Node.js v22.
+2. **Frontend Deployment**: Compiles the React build with production variables and syncs assets directly to the S3 bucket (`aws s3 sync`).
+3. **Docker Build & Push**: Builds the backend image, tags it with the GitHub SHA, and pushes it to Amazon Elastic Container Registry (ECR).
+4. **ECS Task Deployment**:
+   * Downloads the active ECS Fargate task definition dynamically.
+   * Renders the updated container image tag (`bubbly-backend:latest`).
+   * deploys the new task definition revision to ECS Fargate, waiting for the services to stabilize.
 
 ---
 
-## Prediction Flow
+## 💻 Local Development Setup
 
-1. **User clicks "Suggested"** on the frontend
-2. **Frontend** calls `GET /api/recommendations`
-3. **Backend** checks user session, calls ML service
-4. **ML Service** for each open bubble:
-   - Skips if user owns bubble
-   - Skips if user already joined
-   - Computes 8 features
-   - Gets probability score from XGBoost
-5. **ML Service** sorts by score, returns top 15 bubble IDs
-6. **Backend** fetches bubble details from DB
-7. **Frontend** displays bubbles on map
+### Backend & ML Service Setup
 
----
+1. **Configure Environment Variables**:
+   Create a [bubbly-backend/.env](file:///c:/Users/Abdelghafor/dev/Bubbly/bubbly-backend/.env) file:
+   ```env
+   PORT=3000
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=postgres
+   DB_USER=postgres
+   DB_PASSWORD=your_password
+   SESSION_SECRET=your_session_secret
+   NODE_ENV=development
+   ```
 
-## Filtering Logic
+2. **Initialize Database**:
+   Ensure PostgreSQL is running locally, then initialize the database tables and seed sample data:
+   ```bash
+   cd bubbly-backend
+   npm install
+   npm run db:setup
+   ```
 
-Suggested bubbles **exclude**:
-- ✗ Bubbles the user **owns**
-- ✗ Bubbles the user **already joined**
-- ✗ Bubbles beyond the **top 15** recommendations
+3. **Start the Microservices**:
+   Run using Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+   Or start services manually:
+   * **Backend**: `npm run dev` in `bubbly-backend` (port 3000)
+   * **ML Service**: `python recommendation_service.py` in `bubbly-backend/ml` (port 5001)
 
----
+### Frontend Setup
 
-## Fallback Mechanism
-
-When ML service is unavailable, the backend uses **interest-based ranking**:
-
-1. Get user's interests
-2. Get each bubble's interests
-3. Count overlapping interests
-4. Sort by overlap count (descending)
-5. Return top 15
-
----
-
-## Running the ML Service
-
-### Prerequisites
-```bash
-cd bubbly-backend/ml
-python -m venv venv
-.\venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-```
-
-### Start Service
-```bash
-python recommendation_service.py
-```
-
-Service runs on `http://localhost:5001` with hot-reload enabled.
-
-### Train Model
-```bash
-curl -X POST http://localhost:5001/train
-```
-
-Or via backend:
-```bash
-curl -X POST http://localhost:3000/api/recommendations/train
-```
+1. **Install and Run**:
+   ```bash
+   cd bubbly-frontend
+   npm install
+   npm run dev
+   ```
+   The client will boot on `http://localhost:5173`.
 
 ---
+
+## 🔄 Database Migration to AWS RDS
+
+Database setup in AWS utilizes a secure container-based migration:
+* On initialization, Fargate executes [db-migrate.js](file:///c:/Users/Abdelghafor/dev/Bubbly/bubbly-backend/utils/db-migrate.js) which loads a packaged SQL dump file into the RDS instance.
+* All database schema files use idempotent constraints (`CREATE TABLE IF NOT EXISTS` and `CREATE INDEX IF NOT EXISTS`) to prevent collision errors during future deployments.
