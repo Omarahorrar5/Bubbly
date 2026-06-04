@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: bubbly-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bubbly
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - bubbly-network
+
   backend:
     build: ./bubbly-backend
     container_name: bubbly-backend
@@ -8,13 +23,15 @@ services:
       - "3000:3000"
     environment:
       - PORT=3000
-      - DB_HOST=host.docker.internal
+      - DB_HOST=db
       - DB_PORT=5432
       - DB_NAME=bubbly
       - DB_USER=postgres
       - DB_PASSWORD=password
       - SESSION_SECRET=your_session_secret_key_here
       - NODE_ENV=production
+    depends_on:
+      - db
     restart: unless-stopped
     networks:
       - bubbly-network
@@ -29,6 +46,9 @@ services:
     restart: unless-stopped
     networks:
       - bubbly-network
+
+volumes:
+  pgdata:
 
 networks:
   bubbly-network:
