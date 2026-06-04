@@ -41,6 +41,41 @@ The project is built on a modern containerized microservices architecture, provi
 
 ---
 
+## 🤖 XGBoost Recommendation System
+
+Bubbly features a personalized group recommendation engine powered by an **XGBoost** (Extreme Gradient Boosting) model. The system predicts which active bubbles a user is most likely to join.
+
+### 1. System Architecture & Flow
+* **ML Microservice**: A Python Flask microservice defined in [recommendation_service.py](file:///c:/Users/Abdelghafor/dev/Bubbly/bubbly-backend/ml/recommendation_service.py) running on port `5001`. It uses `xgboost` to train a binary classifier (`XGBClassifier`) and save the model file as `model.pkl`.
+* **Express Backend**: The Express controller [recommendationController.js](file:///c:/Users/Abdelghafor/dev/Bubbly/bubbly-backend/controllers/recommendationController.js) calls the ML microservice endpoints. It exposes the user recommendations at the public route `GET /api/recommendations`.
+* **Frontend**: The React client fetches personalized bubble suggestions when the user selects the **"Suggested"** filter on the map interface.
+
+### 2. Feature Engineering
+Each user-bubble candidate pair is scored using 8 engineered features:
+* **`jaccard`**: Jaccard similarity index of user and bubble interests.
+* **`common_interests`**: Total count of interests shared between the user and the bubble.
+* **`user_interest_count`**: Total number of interests in the user's profile.
+* **`bubble_interest_count`**: Total number of interests tagged on the bubble.
+* **`user_age`**: The user's age.
+* **`member_count`**: The current number of joined members in the bubble.
+* **`fill_rate`**: The current member count divided by the bubble's maximum capacity.
+* **`days_old`**: Number of days since the bubble was created.
+
+### 3. Model Training & Class Imbalance
+* The model is trained on historical data from **closed bubbles**, treating user-bubble joins as positive labels (`1`) and non-joins as negative labels (`0`).
+* To address the training label class imbalance (where non-joins heavily outweigh joins), the training pipeline dynamically calculates a `scale_pos_weight` ratio (negative count / positive count) to weight positive instances higher during fitting.
+
+### 4. Microservice Integration & Fallback
+* **Normal Flow**: The Express backend makes an internal HTTP `POST` request to the ML service's `/predict` endpoint, which returns the top 15 recommended bubble IDs.
+* **Fallback Flow**: If the ML service is down, times out (after 5 seconds), or training is incomplete, the backend automatically calls [RecommendationController.getInterestBasedRecommendations](file:///c:/Users/Abdelghafor/dev/Bubbly/bubbly-backend/controllers/recommendationController.js#L81) to rank open bubbles using a direct PostgreSQL interest-overlap count query, ensuring uninterrupted application service.
+
+### 5. API Endpoints
+* `GET /api/recommendations` - Returns top 15 recommended bubbles for the active user.
+* `POST /api/recommendations/train` - Triggers model re-training on historical closed bubbles (Admin only).
+* `GET /api/recommendations/health` - Performs service health checks.
+
+---
+
 ## 🌐 AWS Infrastructure (Terraform)
 
 All resources are provisioned as Code using Terraform. The cloud architecture is highly secured, utilizing isolated private subnets.
